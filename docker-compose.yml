@@ -1,0 +1,36 @@
+version: '2.2'
+
+services:
+    database:
+      image: mysql:latest
+      restart: unless-stopped
+      env_file:
+      - .env.docker
+      environment:
+        MYSQL_ROOT_PASSWORD: ywsTT6OX1901x7XqXNHFroot
+        MYSQL_USER: cgxWPGAdyEUX
+        MYSQL_PASSWORD: bIGe107xY2yRqtoQPe1E
+        MYSQL_DATABASE: budget-tracker
+      ports:
+        - '127.0.0.1:33006:3306'
+    bemodule:
+      tty: true
+      build:
+        context: ./Docker/BE/
+        dockerfile: Dockerfile
+      volumes:
+        - ./:/var/www/workdir
+        - .env:/var/www/workdir/.env
+      depends_on:
+        - database
+      restart: unless-stopped
+    femodule:
+      build:
+        context: ./Docker/FE/
+        dockerfile: Dockerfile
+      depends_on:
+        - bemodule
+      volumes:
+          - ./:/usr/src/app
+          - ./.env:/usr/src/app/.env
+      restart: unless-stopped
