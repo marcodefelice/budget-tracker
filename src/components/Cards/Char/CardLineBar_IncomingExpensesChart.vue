@@ -109,11 +109,11 @@ export default {
             },
             tooltips: {
               mode: "index",
-              intersect: true,
+              intersect: false,
             },
             hover: {
               mode: "nearest",
-              intersect: true,
+              intersect: false,
             },
             scales: {
               xAxes: [
@@ -150,8 +150,8 @@ export default {
                     fontColor: "white",
                   },
                   gridLines: {
-                    borderDash: [2],
-                    borderDashOffset: [2],
+                    borderDash: [3],
+                    borderDashOffset: [3],
                     drawBorder: false,
                     color: "rgba(33, 37, 41, 0.3)",
                     zeroLineColor: "rgba(0, 0, 0, 0)",
@@ -202,6 +202,8 @@ export default {
               backgroundColor: randomColor,
               borderColor: randomColor,
               data: [],
+              fill: false,
+              barThickness: 50,
             }
 
             response.forEach(element => {
