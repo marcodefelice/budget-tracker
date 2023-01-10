@@ -19,6 +19,7 @@ class BudgetController extends Controller
     protected $account;
     protected $type;
     protected $pagination = 50;
+    protected $paginate = null;
 
     /**
     * @param string $dateTime
@@ -161,17 +162,21 @@ class BudgetController extends Controller
     }
 
     /*
-    * return BudgetBackersModel
     * @param \Illuminate\Database\Eloquent\Builder $data
+    * @param bool $relations
+    *
     * @return \Illuminate\Database\Eloquent\Builder 
     */
-    protected function get(\Illuminate\Database\Eloquent\Builder $data)
+    protected function get(\Illuminate\Database\Eloquent\Builder $data, $relations = true)
     {
+      if($relations === true) {
         $data->with("subCategory.category")
         ->with("account")
         ->with("payee.account")
         ->with("label")
         ->with("transferTo");
+      }
+
         
       if(!empty($this->startDateTime)) {
         $data->where("created_at", "<=", $this->startDateTime);
@@ -211,7 +216,7 @@ class BudgetController extends Controller
 
     /**
      * get toal by type
-     * @param array $types 
+     * @param array $types of entries to analyze
      * @param Illuminate\Database\Eloquent\Collection $entry
      * 
      * @return array with all sum
@@ -244,6 +249,19 @@ class BudgetController extends Controller
         Log::error("Unabe to Math total amout ".$e);
       }
 
+    }
+
+    /**
+     * get all entry data
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getEntries()
+    {
+      $data = \App\Models\Entry::where("planned", 1);
+
+
+      $$expenses = $this->get($data);
     }
 
 }

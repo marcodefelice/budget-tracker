@@ -203,14 +203,14 @@ export default {
               borderColor: randomColor,
               data: [],
               fill: false,
-              barThickness: 20,
+              barThickness: 50,
             }
 
             response.forEach(element => {
               dataset.data.push(element.total)
               dataset.label = e
             });
-
+            dataset.data.push(0)
             this.datasets.push(dataset)
 
             if (e == "expenses") {

@@ -122,7 +122,7 @@ Route::get('stats/month-wallet/expenses', function() {
 
 Route::get('stats/month-wallet/planned', function() {
   $stats = new StatsController();
-  return $stats->getStatsPlannedMonthWallet("expenses");
+  return $stats->getStatsPlannedMonthWallet();
 });
 
 Route::get('entries/account/{id}/{filter?}', function($id,$filter = null) {

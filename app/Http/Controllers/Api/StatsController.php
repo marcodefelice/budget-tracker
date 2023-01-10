@@ -25,25 +25,42 @@ class StatsController extends BudgetController
       $start = date("Y/m/01 00:01:01", strtotime("-1 Month", time()));
       $count = 0;
 
+      //TODO: make these choose how an options
+      $salaryCat = SubCategory::whereIn(
+        "uuid",
+        [
+          "6357ff2aaf8eb",
+          "6357ff2ab1a47",
+          "635bd34262b0a",
+          "635bd34262b0a",
+          "635bd34ac3e9b",
+          "635bd34c00eec",
+          "635bd349b66a4"
+        ]
+      )->get();
+
       while ($count <= 1) {
 
         $next =  date("Y/m/01 00:01:01", strtotime("+1 Month", strtotime($start)));
         $before = date("Y/m/01 00:01:01", strtotime($start));
 
-        $salaryCat = SubCategory::where("uuid", "6357ff2aaf8eb")->firstOrFail();
-        $sellCat = SubCategory::where("uuid", "6357ff2ab1a47")->firstOrFail();
-
         $data = Entry::where("type", "incoming");
         $data->where("transfer", 0);
-        $data->whereIn("category_id", [$salaryCat->id, $sellCat->id]);
+
+        foreach ($salaryCat as $cat) {
+          $category[] = $cat->id;
+        }
+
+        $data->whereIn("category_id", $category);
         $data->where("created_at", "<=", $next);
         $data->where("created_at", ">=", $before);
-        $data->where("planned",0);
+        $data->where("planned", 0);
         $entries[] = $data->get();
 
         $count++;
         $start = date("Y/m/01 00:01:01", time());
       }
+
       $total_month = MathController::sum($entries[0]);
       $total_month_before = MathController::sum($entries[1]);
       $percentage = MathController::getPercentage($total_month, $total_month_before);
@@ -79,7 +96,7 @@ class StatsController extends BudgetController
         $data->where("transfer", 0);
         $data->where("created_at", "<=", $next);
         $data->where("created_at", ">=", $before);
-        $data->where("planned",0);
+        $data->where("planned", 0);
         $entries[] = $data->get();
 
         $count++;
@@ -107,26 +124,24 @@ class StatsController extends BudgetController
    * 
    * @return array
    */
-  public function getStatsPlannedMonthWallet($type)
+  public function getStatsPlannedMonthWallet()
   {
-    return response(Cache::get("getStatsPlannedMonthWallet", function () use($type) {
-      
+    return response(Cache::get("gestStatsPlannedMonthWallet", function () {
+
       $date = new \DateTime('now');
       $date->modify('last day of this month');
-      $currentDate = $date->format('Y-m-d');
+      $startTime = $date->format('Y-m-d');
 
-        $data = Entry::where("type", $type);
-        $data->where("transfer", 0);
-        $data->where("created_at", ">=", $currentDate);
-        $data->where("planned",1);
-        $entries = $data->get();
+      $date->modify("first day of this month");
+      $endTime = $date->format('Y-m-d');
 
+      $data = Entry::where("planned", 1);
+      $this->startDateTime = $startTime;
+      $this->endDateTime = $endTime;
+      $this->pagination = false;
+      $entries = $this->get($data, false);
 
-      $total = MathController::sum($entries);
-
-      $returnData = [
-        "total" => $total,
-      ];
+      $returnData = $this->getTotalType(["expenses", "incoming"], $entries);
 
       Cache::forever("getStatsPlannedMonthWallet", $returnData);
       return $returnData;
@@ -171,11 +186,11 @@ class StatsController extends BudgetController
   public function getTotalWallet(int $id, $planned = false)
   {
     $cache = "wallet-";
-    if($planned === true) {
+    if ($planned === true) {
       $cache = "wallet-planned-";
     }
 
-    return response(Cache::get($cache . $id, function () use ($id, $planned,$cache) {
+    return response(Cache::get($cache . $id, function () use ($id, $planned, $cache) {
       if (empty($id)) {
         $account = 0;
         $id = [41, 1, 11, 31, 21, 192]; //TODO: make configurable
@@ -190,19 +205,18 @@ class StatsController extends BudgetController
       $transfer = Entry::where("type", "transfer")->whereIn("account_id", $id);
 
       if ($planned === true) {
-        $entry->whereIn("planned", [0,1]);
-        $expenses->whereIn("planned", [0,1]);
-        $debit->whereIn("planned", [0,1]);
+        $entry->whereIn("planned", [0, 1]);
+        $expenses->whereIn("planned", [0, 1]);
+        $debit->whereIn("planned", [0, 1]);
 
         $date = new \DateTime('now');
         $date->modify('last day of this month');
         $currentDate = $date->format('Y-m-d');
 
-        $currentDate = date("Y-m-31",time());
+        $currentDate = date("Y-m-31", time());
         $entry->where("created_at", "<=", $currentDate);
         $expenses->where("created_at", "<=", $currentDate);
         $debit->where("created_at", "<=", $currentDate);
-
       } else {
         $entry->where("planned", 0);
         $expenses->where("planned", 0);

@@ -99,6 +99,7 @@ class BarGraphController extends BudgetGraphController
             $timeStart = $dataStart;
             $timeEnd = $dataEnd;
             $category = SubCategory::all();
+            $response = [];
 
             foreach($category as $cat) {
                 $filter = [

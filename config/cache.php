@@ -49,6 +49,10 @@ return [
             'lock_connection' => null,
         ],
 
+        'none' => [
+            'driver' => 'null',
+        ],
+
         'file' => [
             'driver' => 'file',
             'path' => storage_path('framework/cache/data'),
