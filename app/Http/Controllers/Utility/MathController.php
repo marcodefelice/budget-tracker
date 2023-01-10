@@ -36,7 +36,7 @@ class MathController
     static public function sum( \Illuminate\Database\Eloquent\Collection|array $data)
     {
       $cost = 0;
-      foreach ($data as $key => $value) {
+      foreach ($data as $value) {
         $cost = $value->amount + $cost;
       }
       return round($cost,2);

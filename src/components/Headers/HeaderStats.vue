@@ -3,8 +3,9 @@
   <div class="relative bg-emerald-600 pb-32 pt-12">
     <div class="px-1 md:px-10 mx-auto w-full">
       <div>
-    <div class="px-2 flex overflow-x-auto mb-2">
-        <CardWallet v-for="w in wallets" :key="w.account_id" :statTitle="w.account_label" :statWallet="w.total_wallet" :statColor="w.color" :statIdWallet="w.account_id"></CardWallet>
+        <div class="px-2 flex overflow-x-auto mb-2">
+          <CardWallet v-for="w in wallets" :key="w.account_id" :statTitle="w.account_label" :statWallet="w.total_wallet"
+            :statColor="w.color" :statIdWallet="w.account_id"></CardWallet>
         </div>
         <!-- Card stats -->
         <div class="flex overflow-x-auto">
@@ -16,14 +17,13 @@
               </a>
             </router-link>
           </div>
-          
+
           <div class="min-w px-2">
             <router-link to="/admin/graph/wallet" v-slot="{ href, navigate }">
               <a :href="href" @click="navigate">
                 <card-stats statSubtitle="MY PLANNED" :statTitle="walletPlanned.statTitle + ' €'"
                   :statArrow="walletPlanned.statArrow" :statPercent="walletPlanned.statPercent"
-                  statIconName="fas fa-coins"
-                  statIconColor="bg-lightBlue-500" />
+                  statIconName="fas fa-coins" statIconColor="bg-lightBlue-500" />
               </a>
             </router-link>
           </div>
@@ -86,7 +86,7 @@ const SAVING_PERCENTAGE = process.env.VUE_APP_BUDGET_SAVING_PERCENTAGE;
 
 export default {
   components: {
-    CardStats,CardWallet
+    CardStats, CardWallet
   },
   data() {
     return {
@@ -127,6 +127,7 @@ export default {
         statPercent: 0,
         statPercentColor: "text-emerald-500"
       },
+      planned: 0
     }
   },
   mounted() {
@@ -134,11 +135,25 @@ export default {
   },
   methods: {
     update() {
+      this.getPlanned()
       this.getMonthIncoming()
       this.getMonthexpenses()
       this.getWallet();
       this.getWalletPlanned();
       this.getWallets()
+    },
+    getPlanned() {
+      axios.get(DOMAIN + "/api/stats/month-wallet/planned", {
+        headers: X_API_KEY,
+      }).then((resp) => {
+
+        let expenses = resp.data.expenses * -1
+        let total = expenses - resp.data.incoming
+        this.planned = total
+
+      }).catch((error) => {
+        console.error(error);
+      })
     },
     getWallet() {
       axios.get(DOMAIN + "/api/stats/wallet", {
@@ -207,24 +222,25 @@ export default {
     },
     getMonthBudget() {
 
-      axios.get(DOMAIN + "/api/stats/month-wallet/planned", {
-        headers: X_API_KEY,
-      }).then((resp) => {
-
-      let savingpercentage = parseFloat(this.incoming.statTitle) * SAVING_PERCENTAGE 
+      let savingpercentage = parseFloat(this.incoming.statTitle) * SAVING_PERCENTAGE
       savingpercentage = savingpercentage / 100
       savingpercentage = this.incoming.statTitle - savingpercentage
 
-      
       let percentage = parseFloat(this.expenses.statTitle) / savingpercentage
       percentage = percentage * 100
       percentage = percentage * -1
 
-      let totalPlanned = resp.data.total
+      if(isNaN(percentage)) {
+        percentage = 100
+      }
 
       let total = savingpercentage + parseFloat(this.expenses.statTitle)
-      total = total - totalPlanned
+      total = total - this.planned
       
+      if(total < 0) {
+        total = 0
+      }
+
       this.budget.statTitle = total.toFixed(2)
       this.budget.statPercent = percentage.toFixed(2)
       this.budget.statArrow = this.budget.statTitle < 0 ? "down" : "up"
@@ -232,21 +248,21 @@ export default {
       let _this = this
       setTimeout(function () { _this.getMonthSavings() }, 2000)
 
-      }).catch((error) => {
-        console.error(error);
-      })
-
-      
 
     },
     getMonthSavings() {
 
       let savings = parseFloat(this.incoming.statTitle) + parseFloat(this.expenses.statTitle)
+      savings = savings - this.planned
       savings = savings <= 0 ? 0 : savings
       let percentage = 0
       if (savings != 0) {
         percentage = savings / parseFloat(this.incoming.statTitle)
         percentage = percentage * 100
+      }
+
+      if(isNaN(percentage)) {
+        percentage = 100
       }
 
       this.savings.statTitle = savings.toFixed(2)
@@ -260,8 +276,9 @@ export default {
 
 <style scoped>
 .min-w {
-  min-width:240px;
+  min-width: 240px;
 }
+
 .relative.flex.flex-col.min-w-0.break-words.bg-white.rounded.mb-6.xl\:mb-0.shadow-lg {
   min-height: 115px;
 }
