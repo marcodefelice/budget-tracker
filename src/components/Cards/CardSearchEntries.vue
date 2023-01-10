@@ -256,7 +256,7 @@ export default {
             action: {
                 account: null,
                 category: null,
-                type: null,
+                type: [],
                 tags: null,
                 text: null
             }

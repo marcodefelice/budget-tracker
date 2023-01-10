@@ -109,11 +109,11 @@ export default {
             },
             tooltips: {
               mode: "index",
-              intersect: false,
+              intersect: true,
             },
             hover: {
               mode: "nearest",
-              intersect: false,
+              intersect: true,
             },
             scales: {
               xAxes: [
@@ -150,8 +150,8 @@ export default {
                     fontColor: "white",
                   },
                   gridLines: {
-                    borderDash: [3],
-                    borderDashOffset: [3],
+                    borderDash: [2],
+                    borderDashOffset: [2],
                     drawBorder: false,
                     color: "rgba(33, 37, 41, 0.3)",
                     zeroLineColor: "rgba(0, 0, 0, 0)",
@@ -202,15 +202,13 @@ export default {
               backgroundColor: randomColor,
               borderColor: randomColor,
               data: [],
-              fill: false,
-              barThickness: 20,
             }
 
             response.forEach(element => {
               dataset.data.push(element.total)
               dataset.label = e
             });
-
+            dataset.data.push(0)
             this.datasets.push(dataset)
 
             if (e == "expenses") {
