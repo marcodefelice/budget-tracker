@@ -46,14 +46,7 @@ class BudgetController extends Controller
      */
     public function incoming(bool $salary = false)
     {
-        $data = BudgetBackersModel::where("type","Entrata");
 
-        if($salary === true) {
-          $data->where("category","stipendio");
-        }
-        $data = $this->get($data);
-
-        return response($data);
     }
 
     /**
@@ -63,11 +56,7 @@ class BudgetController extends Controller
      */
     public function incomingByCategory(string $category)
     {
-        $data = BudgetBackersModel::where("type","Entrata");
-        $data->where("category",$category);
-        $data = $this->get($data);
 
-        return response($data);
     }
 
     /**
@@ -76,10 +65,7 @@ class BudgetController extends Controller
      */
     public function expenses()
     {
-        $data = BudgetBackersModel::where("type","Uscite");
-        $data = $this->get($data);
 
-        return response($data);
     }
 
     /**
@@ -89,11 +75,7 @@ class BudgetController extends Controller
      */
     public function expensesByCategory(string $category)
     {
-        $data = BudgetBackersModel::where("type","Uscite");
-        $data->where("category",$category);
-        $data = $this->get($data);
 
-        return response($data);
     }
 
     /**
@@ -263,7 +245,7 @@ class BudgetController extends Controller
         $data = \App\Models\Entry::where("planned", 1);
         $$expenses = $this->get($data);
         return $expenses;
-      })
+      });
 
     }
 
