@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\BudgetBackersModel;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class BudgetController extends Controller
 {
@@ -256,12 +257,14 @@ class BudgetController extends Controller
      * 
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getEntries()
+    public function getPlannesEntries()
     {
-      $data = \App\Models\Entry::where("planned", 1);
+      return Cache::tags(["stored_data","budget"])->remember("PlannesEntries",env("CACHE_TTL"), function() {
+        $data = \App\Models\Entry::where("planned", 1);
+        $$expenses = $this->get($data);
+        return $expenses;
+      })
 
-
-      $$expenses = $this->get($data);
     }
 
 }

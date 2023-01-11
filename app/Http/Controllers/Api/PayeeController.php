@@ -16,8 +16,11 @@ class PayeeController extends BudgetController
    * @return \Illuminate\Http\Response
    */
   public function index()
-  {
-      return response(Payee::all());
+  {     
+    return Cache::tags(["stored_data","payee"])->remember("payee",env("CACHE_TTL"),function() use() {
+        return response(Payee::all());
+    });
+
   }
 
   /**

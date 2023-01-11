@@ -20,7 +20,7 @@ class CategoryController extends Controller
       return response(
         Cache::get("Category",function() {
           $Category = Category::with("subcategory")->get();
-          Cache::tags(["stored_data"])->forEver($Category,"Category");
+          Cache::tags(["stored_data","category"])->forEver($Category,"Category");
           return $Category;
         })
       );
@@ -55,7 +55,9 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-      return response(Category::findOrFail($id)->with("subcategory")->get());
+      return Cache::tags(["stored_data","category"])->remember("category-".$id,env("CACHE_TTL"),function() use($id) {
+        return response(Category::findOrFail($id)->with("subcategory")->get());
+      })
     }
 
     /**
@@ -91,5 +93,6 @@ class CategoryController extends Controller
     {
       $db = Category::findOrFail($id)->with("subcategory")->orderBy("name")->get();
       $db->delete();
+      Cache::tags(["category"])->flush();
     }
 }

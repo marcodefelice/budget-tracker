@@ -19,7 +19,7 @@ class PaymentTypeController extends Controller
     return response(
       Cache::get("PaymentsTypes",function() {
         $PaymentsTypes = PaymentsTypes::where("uuid", "!=", '')->orderBy("name")->get();
-        Cache::tags(["stored_data"])->forEver($PaymentsTypes,"PaymentsTypes");
+        Cache::tags(["stored_data","payment_type"])->forEver($PaymentsTypes,"PaymentsTypes");
         return $PaymentsTypes;
       })
     );
