@@ -49,3 +49,4 @@ Homestead.json
 /.vagrant
 .phpunit.result.cache
 storage/*.csv
+storage/redis-persistence/

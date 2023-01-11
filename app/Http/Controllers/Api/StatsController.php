@@ -126,7 +126,7 @@ class StatsController extends BudgetController
    */
   public function getStatsPlannedMonthWallet()
   {
-    return response(Cache::get("gestStatsPlannedMonthWallet", function () {
+    return (Cache::get("gestStatsPlannedMonthWallet", function () {
 
       $date = new \DateTime('now');
       $date->modify('last day of this month');
@@ -173,6 +173,44 @@ class StatsController extends BudgetController
   }
 
   /**
+   * get sum of wallets
+   */
+  public function getSumWallets($planned = false) {
+
+    $cache = "sum_wallets";
+    if ($planned === true) {
+      $cache = "sum_wallets-planned";
+    }
+
+    return Cache::tags(["stored_data","stats"])->remember($cache,env("CACHE_TTL"), function() use($planned) {
+        $accountsId = [41, 1, 11, 31, 21, 192]; //TODO: make configurable
+        $total = 0;
+        foreach($accountsId as $id) {
+          $wallet = $this->getTotalWallet($id);
+          $wallet = $wallet['total'];
+          if($wallet >= 0) {
+            // is positive
+            $total = $total + $wallet;
+          } else {
+            // is negative
+            $wallet = $wallet * -1;
+            $total = $total - $wallet;
+          }
+        }
+
+        if($planned === true) {
+          $planned = $this->getStatsPlannedMonthWallet();
+          
+          $total = $total + $planned["incoming"];
+          $planned["expenses"] = $planned["expenses"] * -1;
+          $total = $total - $planned["expenses"];
+        }
+
+        return $total;
+    });
+  }
+
+  /**
    * get total wallet
    * p = param
    * i = incoming
@@ -181,7 +219,7 @@ class StatsController extends BudgetController
    * i = ( entry + e )
    * @param int $id
    * @param bool $time
-   * @return \Illuminate\Http\Response
+   * @return array
    */
   public function getTotalWallet(int $id, $planned = false)
   {
@@ -190,14 +228,10 @@ class StatsController extends BudgetController
       $cache = "wallet-planned-";
     }
 
-    return response(Cache::get($cache . $id, function () use ($id, $planned, $cache) {
-      if (empty($id)) {
-        $account = 0;
-        $id = [41, 1, 11, 31, 21, 192]; //TODO: make configurable
-      } else {
-        $account = $id;
-        $id = [$id];
-      }
+    return (Cache::get($cache . $id, function () use ($id, $planned, $cache) {
+    
+      $account = $id;
+      $id = [$id];
 
       $entry = Entry::where("type", "incoming")->whereIn("account_id", $id);
       $expenses = Entry::where("type", "expenses")->whereIn("account_id", $id);

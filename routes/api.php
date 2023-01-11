@@ -90,7 +90,12 @@ Route::delete('planned-entries/{id}', function($id) {
   return $planned->deletePlanned($id);
 });
 
-Route::get('stats/wallet/{id?}', function($id = 0) {
+Route::get('stats/wallet/', function() {
+  $stats = new StatsController();
+  return $stats->getSumWallets(false);
+});
+
+Route::get('stats/wallet/{id}', function($id) {
   $stats = new StatsController();
   return $stats->getTotalWallet((int) $id,false);
 });
@@ -102,7 +107,7 @@ Route::post('search/{id?}', function(Request $request) {
 
 Route::get('stats/wallet-planned/', function(Request $request) {
   $stats = new StatsController();
-  return $stats->getTotalWallet(0,true);
+  return $stats->getSumWallets(true);
 });
 
 Route::post('stats/wallet/', function(Request $request) {
