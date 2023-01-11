@@ -87,7 +87,7 @@ class PayeeController extends BudgetController
      $payee->type = 1;
      $payee->save();
 
-     Cache::flush();
+     Cache::tags(["payee"])->flush();
      
      return response("Forget debit OK");
   }
@@ -107,7 +107,7 @@ class PayeeController extends BudgetController
         $entries->amount = $amount;
     }
 
-    Cache::forever("get-all_payee",$data);
+    Cache::tags(["stored_data","payee"])->forever("get-all_payee",$data);
 
     return response($data);
   }

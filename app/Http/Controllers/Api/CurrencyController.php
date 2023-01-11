@@ -19,7 +19,7 @@ class CurrencyController extends Controller
       return response(
         Cache::get("Currency",function() {
           $Currency = Currency::all();
-          Cache::forEver($Currency,"Currency");
+          Cache::tags(["stored_data"])->forEver($Currency,"Currency");
           return $Currency;
         })
       );

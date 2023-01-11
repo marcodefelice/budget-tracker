@@ -25,7 +25,9 @@ class EntriesController extends BudgetController
    */
   public function index()
   {
-    return response(Entry::all());
+    $data = Entry::all();
+    Cache::tags(["new_data"])->put("entries",$data,env("CACHE_TTL"));
+    return response($data);
   }
 
   /**

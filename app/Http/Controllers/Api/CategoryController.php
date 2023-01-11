@@ -20,7 +20,7 @@ class CategoryController extends Controller
       return response(
         Cache::get("Category",function() {
           $Category = Category::with("subcategory")->get();
-          Cache::forEver($Category,"Category");
+          Cache::tags(["stored_data"])->forEver($Category,"Category");
           return $Category;
         })
       );
