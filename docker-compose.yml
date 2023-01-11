@@ -5,12 +5,12 @@ services:
       image: mysql:latest
       restart: unless-stopped
       env_file:
-      - .env.docker
+      - ./docker/.env
       environment:
-        MYSQL_ROOT_PASSWORD: ywsTT6OX1901x7XqXNHFroot
-        MYSQL_USER: cgxWPGAdyEUX
-        MYSQL_PASSWORD: bIGe107xY2yRqtoQPe1E
-        MYSQL_DATABASE: budget-tracker
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
       ports:
         - '127.0.0.1:33006:3306'
     bemodule:
@@ -18,11 +18,14 @@ services:
       build:
         context: ./Docker/BE/
         dockerfile: Dockerfile
+      ports:
+        - '127.0.0.1:3030:3000'
       volumes:
         - ./:/var/www/workdir
         - .env:/var/www/workdir/.env
       depends_on:
         - database
+        - redis
       restart: unless-stopped
     femodule:
       build:
@@ -34,3 +37,28 @@ services:
           - ./:/usr/src/app
           - ./.env:/usr/src/app/.env
       restart: unless-stopped
+    redis-master:
+      env_file:
+      - ./docker/.env
+      image: 'bitnami/redis:latest'
+      ports:
+        - '6379'
+      environment:
+        - REDIS_REPLICATION_MODE=master
+        - REDIS_PASSWORD=${REDIS_PASSWORD}
+      volumes:
+        - './storage/redis-persistence:/bitnami'
+    redis-replica:
+      env_file:
+      - ./docker/.env
+      image: 'bitnami/redis:latest'
+      ports:
+        - '6379'
+      depends_on:
+        - redis-master
+      environment:
+        - REDIS_REPLICATION_MODE=slave
+        - REDIS_MASTER_HOST=redis-master
+        - REDIS_MASTER_PORT_NUMBER=6379
+        - REDIS_MASTER_PASSWORD=${REDIS_PASSWORD}
+        - REDIS_PASSWORD=${REDIS_PASSWORD_REPLICA}
