@@ -174,6 +174,9 @@ class StatsController extends BudgetController
 
   /**
    * get sum of wallets
+   * @param bool $planned
+   * 
+   * @return array results
    */
   public function getSumWallets($planned = false) {
 
@@ -206,7 +209,7 @@ class StatsController extends BudgetController
           $total = $total - $planned["expenses"];
         }
 
-        return $total;
+        return ["total" => $total];
     });
   }
 
