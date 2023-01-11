@@ -20,9 +20,9 @@ class AccountController extends Controller
     public function index()
     {
         return response(
-          Cache::get("account",function() {
+          Cache::get("accounts",function() {
             $account = Account::where("deleted_at",null)->get();
-            Cache::forEver($account,"account");
+            Cache::tags(["stored_data"])->forEver($account,"accounts");
             return $account;
           })
         );
@@ -102,7 +102,7 @@ class AccountController extends Controller
         $account->action = "walletFix_configuration";
         $account->save();
 
-        Cache::flush();
+        Cache::forget('wallet-'.$request->account_id);
 
         return response("ok");
     }

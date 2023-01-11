@@ -25,7 +25,9 @@ class EntriesController extends BudgetController
    */
   public function index()
   {
-    return response(Entry::all());
+    $data = Entry::all();
+    Cache::tags(["new_data","entry"])->put("entries",$data,env("CACHE_TTL"));
+    return response($data);
   }
 
   /**
@@ -150,7 +152,7 @@ class EntriesController extends BudgetController
 
     Log::info("Stored new entry with id " . $db->id);
 
-    Cache::flush();
+    Cache::tags("entry")->lush();
 
     return response("ok");
   }
@@ -202,8 +204,11 @@ class EntriesController extends BudgetController
    * @return \Illuminate\Http\Response
    */
   public function getPlannedEntries() {
-    $plannedEntries = \App\Models\PlannedEntries::with("subCategory.category")->with("account")->get();
-    return response($plannedEntries);
+    return Cache::tags(["stored_data","entry"])->remember("getPlannedEntries",env("CACHE_TTL"),function() {
+      $plannedEntries = \App\Models\PlannedEntries::with("subCategory.category")->with("account")->get();
+      return response($plannedEntries);
+    });
+
   }
 
   /**
@@ -293,7 +298,7 @@ class EntriesController extends BudgetController
       }
 
       $entries = $entries->paginate(50);
-      Cache::forever($cache, $entries);
+      Cache::tags(["stored_data","entry"])->forever($cache, $entries);
 
       return $entries;
     }));
@@ -361,7 +366,7 @@ class EntriesController extends BudgetController
 
     $total = $this->getTotalType($type,$entries);
     $response = ["data" => $entries,"total" => $total];
-    Cache::put($cache,$response);
+    Cache::tags(["stored_data","entry","search"])->put($cache,$response,env("CACHE_TTL"));
 
     return response($response);
   }
@@ -374,8 +379,11 @@ class EntriesController extends BudgetController
    */
   public function show($id)
   {
-    $entries = Entry::with("label")->where("id", $id)->firstOrFail();
-    return response($entries);
+    return Cache::tags(["stored_data","entry"])->remember("label-".$id,env("CACHE_TTL"),function() use($id) {
+      $entries = Entry::with("label")->where("id", $id)->firstOrFail();
+      return response($entries);
+    });
+
   }
 
   /**
@@ -410,7 +418,7 @@ class EntriesController extends BudgetController
   public function destroy($id)
   {
     Entry::findOrFail($id)->delete();
-    Cache::flush();
+    Cache::tags("entry")->flush();
     Log::info("Deleted entry with id " . $id);
   }
 
@@ -419,7 +427,7 @@ class EntriesController extends BudgetController
    */
   public function deletePlanned($id) {
     PlannedEntries::findOrFail($id)->delete();
-    Cache::flush();
+    Cache::tags("entry")->flush();
     Log::info("Deleted planned entry with id " . $id);
   }
 }

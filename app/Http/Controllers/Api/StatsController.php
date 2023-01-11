@@ -71,7 +71,7 @@ class StatsController extends BudgetController
         "percend_different" => $percentage
       ];
 
-      Cache::forever("getStatsIncomingMonthWallet", $returnData);
+      Cache::tags(["stored_data","stats"])->forever("getStatsIncomingMonthWallet", $returnData);
       return $returnData;
     }));
   }
@@ -113,7 +113,7 @@ class StatsController extends BudgetController
         "percend_different" => $percentage
       ];
 
-      Cache::forever("getStatsExpensiveMonthWallet", $returnData);
+      Cache::tags(["stored_data","stats"])->forever("getStatsExpensiveMonthWallet", $returnData);
       return $returnData;
     }));
   }
@@ -143,7 +143,7 @@ class StatsController extends BudgetController
 
       $returnData = $this->getTotalType(["expenses", "incoming"], $entries);
 
-      Cache::forever("getStatsPlannedMonthWallet", $returnData);
+      Cache::tags(["stored_data","stats"])->forever("getStatsPlannedMonthWallet", $returnData);
       return $returnData;
     }));
   }
@@ -166,7 +166,7 @@ class StatsController extends BudgetController
             "color" => $account->color
           ];
         }
-        Cache::forever("wallets", $response);
+        Cache::tags(["stored_data","stats"])->forever("wallets", $response);
         return $response;
       })
     );
@@ -307,7 +307,7 @@ class StatsController extends BudgetController
       }
 
       $response = ["total" => round($total, 2)];
-      Cache::forever($cache . $account, $response);
+      Cache::tags(["stored_data","stats"])->forever($cache . $account, $response);
       return $response;
     }));
   }

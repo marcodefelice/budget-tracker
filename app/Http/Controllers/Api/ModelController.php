@@ -24,7 +24,7 @@ class ModelController extends Controller
       return response(
         Cache::get("Models",function() {
           $Models = Models::with("label")->get();
-          Cache::forEver($Models,"Models");
+          Cache::tags(["stored_data","models"])->forEver($Models,"Models");
           return $Models;
         })
       );

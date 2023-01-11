@@ -12,6 +12,7 @@ use App\Models\Entry;
 use App\Models\PlannedEntries;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use PhpParser\Node\Stmt\Catch_;
 
 class InsertPlannedEntry implements ShouldQueue
@@ -37,6 +38,7 @@ class InsertPlannedEntry implements ShouldQueue
     {
         $this->insertEntry($this->getPlannedEntry());
         \App\Http\Controllers\OperationsController::cleanPlannedEntries();
+
     }
 
     /**
@@ -89,6 +91,7 @@ class InsertPlannedEntry implements ShouldQueue
             }
 
             $this->updatePlanningEntry($data);
+            Cache::tags(["entry","search","stats"])->flush();
 
         } catch (Exception $e) {
             Log::critical("Unable to insert new planned entry " . $e);

@@ -16,8 +16,11 @@ class PayeeController extends BudgetController
    * @return \Illuminate\Http\Response
    */
   public function index()
-  {
-      return response(Payee::all());
+  {     
+    return Cache::tags(["stored_data","payee"])->remember("payee",env("CACHE_TTL"),function() use() {
+        return response(Payee::all());
+    });
+
   }
 
   /**
@@ -87,7 +90,7 @@ class PayeeController extends BudgetController
      $payee->type = 1;
      $payee->save();
 
-     Cache::flush();
+     Cache::tags(["payee"])->flush();
      
      return response("Forget debit OK");
   }
@@ -107,7 +110,7 @@ class PayeeController extends BudgetController
         $entries->amount = $amount;
     }
 
-    Cache::forever("get-all_payee",$data);
+    Cache::tags(["stored_data","payee"])->forever("get-all_payee",$data);
 
     return response($data);
   }

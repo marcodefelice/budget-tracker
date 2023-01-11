@@ -82,6 +82,7 @@ class ImportService extends DropboxService
       Cache::flush();
       Log::info("Flush cache");
       Log::info("Finish process ####");
+      Cache::tags(["entry","search","labels","stats"])->flush();
       return true;
     }
     Log::warning("No csv file found to import");
