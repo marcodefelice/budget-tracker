@@ -366,7 +366,7 @@ class EntriesController extends BudgetController
 
     $total = $this->getTotalType($type,$entries);
     $response = ["data" => $entries,"total" => $total];
-    Cache::tags(["stored_data","entry"])->put($cache,$response,env("CACHE_TTL"));
+    Cache::tags(["stored_data","entry","search"])->put($cache,$response,env("CACHE_TTL"));
 
     return response($response);
   }
