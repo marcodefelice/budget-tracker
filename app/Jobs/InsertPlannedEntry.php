@@ -38,7 +38,6 @@ class InsertPlannedEntry implements ShouldQueue
     {
         $this->insertEntry($this->getPlannedEntry());
         \App\Http\Controllers\OperationsController::cleanPlannedEntries();
-        Cache::tags(["entry","search","stats"])->flush();
 
     }
 
@@ -92,6 +91,7 @@ class InsertPlannedEntry implements ShouldQueue
             }
 
             $this->updatePlanningEntry($data);
+            Cache::tags(["entry","search","stats"])->flush();
 
         } catch (Exception $e) {
             Log::critical("Unable to insert new planned entry " . $e);
