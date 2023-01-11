@@ -162,7 +162,7 @@ class StatsController extends BudgetController
           $response[] = [
             "account_id" => $account->id,
             "account_label" => $account->name,
-            "total_wallet" => $total->original['total'],
+            "total_wallet" => $total['total'],
             "color" => $account->color
           ];
         }
