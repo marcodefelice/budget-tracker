@@ -152,7 +152,7 @@ class EntriesController extends BudgetController
 
     Log::info("Stored new entry with id " . $db->id);
 
-    Cache::tags("entry")->lush();
+    Cache::tags(["entry","stats"])->flush();
 
     return response("ok");
   }

@@ -19,7 +19,7 @@ class LabelsController extends Controller
       return response(
         Cache::get("Labels",function() {
           $Labels = Labels::orderBy("name")->get();
-          Cache::ftags(["stored_data","labels"])->orEver($Labels,"Labels");
+          Cache::tags(["stored_data","labels"])->forEver($Labels,"Labels");
           return $Labels;
         })
       );

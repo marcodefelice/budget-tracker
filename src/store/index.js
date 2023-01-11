@@ -5,6 +5,9 @@ const store =  createStore({
       filter_graph: {
         year: null,
         month: null
+      },
+      actions: {
+        updatestats: false
       }
     },
   })

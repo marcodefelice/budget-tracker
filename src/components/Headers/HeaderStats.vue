@@ -133,6 +133,18 @@ export default {
   mounted() {
     this.update()
   },
+  watch: {
+    "$store.state.actions.updatestats": function (updatestats) {
+      if(updatestats === true) {
+        this.getPlanned()
+        this.getMonthIncoming()
+        this.getMonthexpenses()
+        this.getWallet();
+        this.getWalletPlanned();
+        this.getWallets()
+      }
+    },
+  },
   methods: {
     update() {
       this.getPlanned()

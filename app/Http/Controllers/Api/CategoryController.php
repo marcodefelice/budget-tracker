@@ -57,7 +57,7 @@ class CategoryController extends Controller
     {
       return Cache::tags(["stored_data","category"])->remember("category-".$id,env("CACHE_TTL"),function() use($id) {
         return response(Category::findOrFail($id)->with("subcategory")->get());
-      })
+      });
     }
 
     /**
