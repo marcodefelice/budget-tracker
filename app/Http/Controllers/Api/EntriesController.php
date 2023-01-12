@@ -266,7 +266,7 @@ class EntriesController extends BudgetController
    */
   public function showFromAccount($id, $filter = null)
   {
-    $cache = sha1("entries-from-account-" . $id . json_encode($filter));
+    $cache = "entries-from-account-" . sha1($id . json_encode($filter));
     return response(Cache::get($cache, function () use ($id, $cache, $filter) {
       $entries = Entry::with("subCategory.category")
         ->with("account")
