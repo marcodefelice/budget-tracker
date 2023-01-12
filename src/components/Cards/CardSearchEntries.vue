@@ -33,6 +33,7 @@
                             <select
                                 class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                                 v-model="action.month">
+                                <option value="">select one</option>
                                 <option v-for="(month, k) in input.month" :key="k" :value="month.id">{{ month.label }}
                                 </option>
                             </select>
@@ -48,6 +49,7 @@
                             <select
                                 class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                                 v-model="action.year">
+                                <option value="">select one</option>
                                 <option v-for="(year, k) in input.year" :key="k" :value="year">{{ year }}</option>
                             </select>
                         </div>

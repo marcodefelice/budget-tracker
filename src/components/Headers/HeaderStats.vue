@@ -23,7 +23,7 @@
               <a :href="href" @click="navigate">
                 <card-stats statSubtitle="MY PLANNED" :statTitle="walletPlanned.statTitle + ' €'"
                   :statArrow="walletPlanned.statArrow" :statPercent="walletPlanned.statPercent"
-                  statIconName="fas fa-coins" statIconColor="bg-lightBlue-500" />
+                  statIconName="fas fa-money-bill" statIconColor="bg-teal-500" />
               </a>
             </router-link>
           </div>
@@ -251,6 +251,7 @@ export default {
       
       if(total < 0) {
         total = 0
+        percentage = 100
       }
 
       this.budget.statTitle = total.toFixed(2)

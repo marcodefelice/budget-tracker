@@ -254,7 +254,7 @@ export default {
                 let info = {
                     id: r.id,
                     date: r.created_at,
-                    amount: r.amount.toFixed(2) + " €",
+                    amount: parseInt(r.amount).toFixed(2) + " €",
                     color_amount: r.amount <= 0 ? "text-red-500" : "text-emerald-500",
                     type_amount: r.amount <= 0 ? "expenses" : "incoming",
                     account: r.account.name,

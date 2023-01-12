@@ -313,7 +313,7 @@ class EntriesController extends BudgetController
   public function find(Request $request)
   {
 
-    $cache = json_encode($request->toArray());
+    $cache = "SEARCH-".sha1(json_encode($request->toArray()));
     if(Cache::has($cache)) {
       return Cache::get($cache);
     }
